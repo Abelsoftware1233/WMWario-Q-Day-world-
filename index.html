@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Super Abel World 🍄</title>
+  <link rel="stylesheet" href="styl.css">
+</head>
+<body>
+  <div id="ui-overlay">
+    <div id="hud">
+      <div class="hud-block">
+        <span class="hud-label">SPELER</span>
+        <span id="hud-name">ABEL</span>
+      </div>
+      <div class="hud-block">
+        <span class="hud-label">SCORE</span>
+        <span id="hud-score">000000</span>
+      </div>
+      <div class="hud-block">
+        <span class="hud-label">MUNTEN</span>
+        <span id="hud-coins">🪙 00</span>
+      </div>
+      <div class="hud-block">
+        <span class="hud-label">WERELD</span>
+        <span id="hud-world">1-1</span>
+      </div>
+      <div class="hud-block">
+        <span class="hud-label">TIJD</span>
+        <span id="hud-time">400</span>
+      </div>
+      <div class="hud-block">
+        <span class="hud-label">LEVENS</span>
+        <span id="hud-lives">❤️ 3</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="screen-start" class="fullscreen-overlay">
+    <div class="menu-box">
+      <div class="menu-logo">🍄 SUPER ABEL WORLD</div>
+      <div class="menu-sub">Drie Epische Levels • Extreem Moeilijk</div>
+      <div class="menu-controls">
+        <div>⬅️ ➡️ = Bewegen</div>
+        <div>Z / SPATIE / ↑ = Springen</div>
+        <div>X / SHIFT = Rennen / Vuur</div>
+        <div>ESC = Pauze</div>
+      </div>
+      <button class="menu-btn" id="btn-start">▶ SPELEN</button>
+      <div class="menu-worlds">
+        <button class="world-btn active" data-world="0">Wereld 1</button>
+        <button class="world-btn" data-world="1">Wereld 2</button>
+        <button class="world-btn" data-world="2">Wereld 3</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="screen-pause" class="fullscreen-overlay hidden">
+    <div class="menu-box">
+      <div class="menu-logo">⏸ PAUZE</div>
+      <button class="menu-btn" id="btn-resume">▶ DOORGAAN</button>
+      <button class="menu-btn secondary" id="btn-quit">🏠 MENU</button>
+    </div>
+  </div>
+
+  <div id="screen-gameover" class="fullscreen-overlay hidden">
+    <div class="menu-box">
+      <div class="menu-logo">💀 GAME OVER</div>
+      <div id="go-score"></div>
+      <button class="menu-btn" id="btn-retry">🔄 OPNIEUW</button>
+      <button class="menu-btn secondary" id="btn-go-menu">🏠 MENU</button>
+    </div>
+  </div>
+
+  <div id="screen-win" class="fullscreen-overlay hidden">
+    <div class="menu-box win-box">
+      <div class="menu-logo">🏆 GEWONNEN!</div>
+      <div id="win-score"></div>
+      <div id="win-coins"></div>
+      <button class="menu-btn" id="btn-next">VOLGENDE LEVEL ▶</button>
+      <button class="menu-btn secondary" id="btn-win-menu">🏠 MENU</button>
+    </div>
+  </div>
+
+  <div id="msg-popup" class="hidden"></div>
+
+  <canvas id="gameCanvas"></canvas>
+
+  <div id="mobile-controls">
+    <div class="mc-left">
+      <button class="mc-btn" id="mc-left">◀</button>
+      <button class="mc-btn" id="mc-right">▶</button>
+    </div>
+    <div class="mc-right">
+      <button class="mc-btn mc-run" id="mc-run">X</button>
+      <button class="mc-btn mc-jump" id="mc-jump">Z</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

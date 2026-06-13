@@ -1,0 +1,304 @@
+/* === RESET & BASE === */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --sky:    #5c94fc;
+  --sky2:   #3b6fd4;
+  --ground: #c84c0c;
+  --brick:  #d07030;
+  --coin:   #ffd700;
+  --green:  #00a800;
+  --hud-bg: rgba(0,0,0,0.82);
+  --hud-border: #ffd700;
+  --red:    #e03030;
+  --white:  #ffffff;
+  --shadow: #000000cc;
+}
+
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: #000;
+  font-family: 'Courier New', monospace;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* === CANVAS === */
+#gameCanvas {
+  display: block;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* === HUD === */
+#ui-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+#hud {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background: var(--hud-bg);
+  border-bottom: 2px solid var(--hud-border);
+  padding: 6px 12px;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.hud-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 60px;
+}
+
+.hud-label {
+  font-size: 8px;
+  letter-spacing: 1px;
+  color: var(--hud-border);
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.hud-block span:last-child {
+  font-size: 13px;
+  color: #fff;
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-shadow: 1px 1px 0 #000;
+}
+
+/* === FULLSCREEN OVERLAYS === */
+.fullscreen-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,20,0.88);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  backdrop-filter: blur(3px);
+}
+
+.fullscreen-overlay.hidden { display: none; }
+
+.menu-box {
+  background: linear-gradient(180deg, #1a1a3e 0%, #0a0a1a 100%);
+  border: 3px solid var(--hud-border);
+  border-radius: 8px;
+  padding: 32px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  min-width: 320px;
+  box-shadow: 0 0 40px rgba(255,215,0,0.3), inset 0 0 30px rgba(255,215,0,0.05);
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.win-box {
+  border-color: #00ff88;
+  box-shadow: 0 0 40px rgba(0,255,136,0.4), inset 0 0 30px rgba(0,255,136,0.05);
+}
+
+.menu-logo {
+  font-size: 28px;
+  font-weight: bold;
+  color: var(--hud-border);
+  text-shadow: 2px 2px 0 #c84c0c, 0 0 20px rgba(255,215,0,0.6);
+  letter-spacing: 2px;
+  text-align: center;
+}
+
+.menu-sub {
+  font-size: 11px;
+  color: #aaa;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.menu-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  color: #ccc;
+  text-align: center;
+  background: rgba(255,255,255,0.05);
+  border-radius: 4px;
+  padding: 10px 16px;
+  width: 100%;
+}
+
+.menu-btn {
+  background: linear-gradient(180deg, #e03030, #800000);
+  border: 2px solid #ff6060;
+  color: #fff;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  padding: 10px 28px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-transform: uppercase;
+  width: 100%;
+  text-shadow: 1px 1px 0 #000;
+}
+
+.menu-btn:hover {
+  background: linear-gradient(180deg, #ff5050, #b00000);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255,0,0,0.4);
+}
+
+.menu-btn.secondary {
+  background: linear-gradient(180deg, #333, #111);
+  border-color: #666;
+  font-size: 12px;
+  padding: 8px 20px;
+}
+
+.menu-btn.secondary:hover {
+  background: linear-gradient(180deg, #444, #222);
+}
+
+#go-score, #win-score, #win-coins {
+  font-size: 18px;
+  color: var(--hud-border);
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+
+/* === WORLD SELECT BUTTONS === */
+.menu-worlds {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  justify-content: center;
+}
+
+.world-btn {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid #555;
+  color: #ccc;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  padding: 6px 14px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.world-btn.active {
+  background: rgba(255,215,0,0.2);
+  border-color: var(--hud-border);
+  color: var(--hud-border);
+}
+
+.world-btn:hover {
+  background: rgba(255,255,255,0.15);
+  border-color: #aaa;
+}
+
+/* === POPUP MSG === */
+#msg-popup {
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.85);
+  border: 2px solid var(--hud-border);
+  color: var(--hud-border);
+  font-size: 16px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  padding: 10px 24px;
+  border-radius: 6px;
+  z-index: 50;
+  pointer-events: none;
+  transition: opacity 0.3s;
+  text-shadow: 1px 1px 0 #000;
+}
+
+#msg-popup.hidden { opacity: 0; display: none; }
+
+/* === MOBILE CONTROLS === */
+#mobile-controls {
+  position: fixed;
+  bottom: 20px;
+  left: 0; right: 0;
+  display: none;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 20;
+  pointer-events: none;
+}
+
+@media (pointer: coarse) {
+  #mobile-controls { display: flex; }
+}
+
+.mc-left, .mc-right {
+  display: flex;
+  gap: 10px;
+  pointer-events: all;
+}
+
+.mc-btn {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.18);
+  border: 2px solid rgba(255,255,255,0.4);
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.1s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mc-btn:active, .mc-btn.pressed {
+  background: rgba(255,215,0,0.4);
+  border-color: var(--hud-border);
+}
+
+.mc-jump {
+  background: rgba(255,60,60,0.3);
+  border-color: rgba(255,60,60,0.6);
+  width: 64px; height: 64px;
+  font-size: 14px;
+}
+
+.mc-run {
+  background: rgba(60,60,255,0.3);
+  border-color: rgba(60,60,255,0.6);
+  font-size: 14px;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 600px) {
+  #hud { padding: 4px 6px; gap: 4px; }
+  .hud-block { min-width: 40px; }
+  .hud-label { font-size: 6px; }
+  .hud-block span:last-child { font-size: 10px; }
+  .menu-box { padding: 20px; min-width: 280px; }
+  .menu-logo { font-size: 20px; }
+}
