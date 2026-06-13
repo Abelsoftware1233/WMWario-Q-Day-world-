@@ -2,101 +2,488 @@
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Super Abel World 🍄</title>
-  <link rel="stylesheet" href="styl.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Super Abel World - 3D Mario Style | 10 Epische Levels</title>
+  <style>
+    * {
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #0a0f1e;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Courier New', 'Press Start 2P', monospace;
+      overflow: hidden;
+      touch-action: none;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: #000;
+      cursor: pointer;
+      box-shadow: 0 0 0 2px #ffd700, 0 0 0 6px #1a1a2e;
+    }
+    #ui {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 20;
+      pointer-events: none;
+      font-family: monospace;
+      padding: 8px 16px;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(4px);
+      border-bottom: 2px solid #ffcc33;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      color: #fff;
+      text-shadow: 2px 2px 0 #000;
+      font-weight: bold;
+    }
+    .ui-stat {
+      background: rgba(0,0,0,0.6);
+      padding: 4px 12px;
+      border-radius: 20px;
+      border-left: 3px solid #ffcc33;
+      display: flex;
+      gap: 8px;
+      align-items: baseline;
+      font-size: 14px;
+    }
+    .ui-stat span:first-child { color: #ffcc33; letter-spacing: 1px; }
+    .ui-stat span:last-child { font-size: 18px; font-weight: bold; color: #fff; }
+    #score { color: #ffaa44; }
+    #coins { color: #ffdd77; }
+    #time { font-family: monospace; }
+    .menu {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.88);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: monospace;
+    }
+    .menu.hidden { display: none; }
+    .menu-card {
+      background: linear-gradient(145deg, #2a2a4a, #0f0f2a);
+      border: 3px solid #ffcc33;
+      border-radius: 32px;
+      padding: 28px 32px;
+      text-align: center;
+      max-width: 500px;
+      width: 80%;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1);
+    }
+    .menu-logo {
+      font-size: 28px;
+      font-weight: bold;
+      color: #ffcc33;
+      text-shadow: 3px 3px 0 #b45f1b;
+      margin-bottom: 12px;
+    }
+    .menu-buttons { display: flex; flex-direction: column; gap: 12px; margin-top: 24px; }
+    button {
+      background: #e25822;
+      border: none;
+      font-family: monospace;
+      font-weight: bold;
+      font-size: 18px;
+      padding: 10px 20px;
+      border-radius: 60px;
+      color: white;
+      text-shadow: 1px 1px 0 #6b2e00;
+      cursor: pointer;
+      transition: all 0.1s ease;
+      box-shadow: 0 4px 0 #6b2e00;
+    }
+    button:active { transform: translateY(2px); box-shadow: 0 2px 0 #6b2e00; }
+    .world-select { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 20px 0; }
+    .world-btn { background: #2c2c5e; font-size: 14px; padding: 6px 14px; box-shadow: none; border: 1px solid #aaa; }
+    .world-btn.active { background: #ffaa33; color: #1f1f2f; border-color: gold; box-shadow: 0 0 8px gold; }
+    .controls-info { font-size: 11px; color: #ccc; margin-top: 10px; border-top: 1px solid #555; padding-top: 12px; }
+    @media (max-width: 600px) {
+      .ui-stat { font-size: 10px; padding: 2px 8px; }
+      .ui-stat span:last-child { font-size: 14px; }
+      .menu-logo { font-size: 20px; }
+      button { font-size: 14px; }
+    }
+  </style>
 </head>
 <body>
-  <div id="ui-overlay">
-    <div id="hud">
-      <div class="hud-block">
-        <span class="hud-label">SPELER</span>
-        <span id="hud-name">ABEL</span>
-      </div>
-      <div class="hud-block">
-        <span class="hud-label">SCORE</span>
-        <span id="hud-score">000000</span>
-      </div>
-      <div class="hud-block">
-        <span class="hud-label">MUNTEN</span>
-        <span id="hud-coins">🪙 00</span>
-      </div>
-      <div class="hud-block">
-        <span class="hud-label">WERELD</span>
-        <span id="hud-world">1-1</span>
-      </div>
-      <div class="hud-block">
-        <span class="hud-label">TIJD</span>
-        <span id="hud-time">400</span>
-      </div>
-      <div class="hud-block">
-        <span class="hud-label">LEVENS</span>
-        <span id="hud-lives">❤️ 3</span>
-      </div>
+<div id="ui">
+  <div class="ui-stat"><span>⭐ SCORE</span><span id="score">0</span></div>
+  <div class="ui-stat"><span>🪙 COINS</span><span id="coins">0</span></div>
+  <div class="ui-stat"><span>🌍 WORLD</span><span id="worldName">1-1</span></div>
+  <div class="ui-stat"><span>⏱ TIME</span><span id="time">400</span></div>
+  <div class="ui-stat"><span>❤️ LIVES</span><span id="lives">3</span></div>
+</div>
+
+<canvas id="gameCanvas" width="1280" height="720"></canvas>
+
+<!-- MENUS -->
+<div id="startMenu" class="menu">
+  <div class="menu-card">
+    <div class="menu-logo">🍄 SUPER ABEL WORLD 🍄</div>
+    <div style="font-size:12px; color:#ffcc88;">10 EPISCHE LEVELS • 3D MARIO STYLE</div>
+    <div class="world-select" id="worldSelect">
+      <button data-world="0" class="world-btn active">1-1 VLAKTE</button><button data-world="1" class="world-btn">1-2 WOESTIJN</button>
+      <button data-world="2" class="world-btn">2-1 NACHT</button><button data-world="3" class="world-btn">2-2 IJS</button>
+      <button data-world="4" class="world-btn">3-1 VULKAAN</button><button data-world="5" class="world-btn">3-2 JUNGLE</button>
+      <button data-world="6" class="world-btn">4-1 LUCHT</button><button data-world="7" class="world-btn">4-2 MINING</button>
+      <button data-world="8" class="world-btn">5-1 KASTEEL</button><button data-world="9" class="world-btn">⭐ FINAL BOW</button>
     </div>
+    <div class="menu-buttons"><button id="startBtn">🚀 START GAME</button></div>
+    <div class="controls-info">◀ ▶ bewegen | Z / SPATIE / ↑ springen | X / SHIFT rennen (sneller) | ESC pauze</div>
   </div>
+</div>
+<div id="pauseMenu" class="menu hidden"><div class="menu-card"><div class="menu-logo">⏸ PAUZE</div><div class="menu-buttons"><button id="resumeBtn">▶ VERDER</button><button id="quitBtn">🏠 MENU</button></div></div></div>
+<div id="gameoverMenu" class="menu hidden"><div class="menu-card"><div class="menu-logo">💀 GAME OVER</div><div id="finalScore"></div><div class="menu-buttons"><button id="retryBtn">🔄 OPNIEUW</button><button id="menuBtn">🏠 MENU</button></div></div></div>
+<div id="winMenu" class="menu hidden"><div class="menu-card"><div class="menu-logo">🏆 LEVEL CLEAR! 🏆</div><div id="winStats"></div><div class="menu-buttons"><button id="nextBtn">NEXT LEVEL ▶</button><button id="winMenuBtn">MENU</button></div></div></div>
 
-  <div id="screen-start" class="fullscreen-overlay">
-    <div class="menu-box">
-      <div class="menu-logo">🍄 SUPER ABEL WORLD</div>
-      <div class="menu-sub">Drie Epische Levels • Extreem Moeilijk</div>
-      <div class="menu-controls">
-        <div>⬅️ ➡️ = Bewegen</div>
-        <div>Z / SPATIE / ↑ = Springen</div>
-        <div>X / SHIFT = Rennen / Vuur</div>
-        <div>ESC = Pauze</div>
-      </div>
-      <button class="menu-btn" id="btn-start">▶ SPELEN</button>
-      <div class="menu-worlds">
-        <button class="world-btn active" data-world="0">Wereld 1</button>
-        <button class="world-btn" data-world="1">Wereld 2</button>
-        <button class="world-btn" data-world="2">Wereld 3</button>
-      </div>
-    </div>
-  </div>
+<script>
+  (function(){
+    // ---------- CANVAS ----------
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    let canvasW, canvasH;
+    function resizeCanvas() {
+      canvasW = window.innerWidth;
+      canvasH = window.innerHeight;
+      canvas.width = canvasW;
+      canvas.height = canvasH;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
 
-  <div id="screen-pause" class="fullscreen-overlay hidden">
-    <div class="menu-box">
-      <div class="menu-logo">⏸ PAUZE</div>
-      <button class="menu-btn" id="btn-resume">▶ DOORGAAN</button>
-      <button class="menu-btn secondary" id="btn-quit">🏠 MENU</button>
-    </div>
-  </div>
+    // ---------- GLOBALS ----------
+    const TILE = 48;        // grotere tiles voor meer detail
+    const GRAVITY = 0.65;
+    const MAX_FALL = 16;
+    const WALK_SPEED = 3.6;
+    const RUN_SPEED = 6.2;
+    const JUMP_FORCE = -12.8;
+    const RUN_JUMP = -14.5;
+    const COYOTE = 7;
+    const JUMP_BUFFER_FRAMES = 7;
 
-  <div id="screen-gameover" class="fullscreen-overlay hidden">
-    <div class="menu-box">
-      <div class="menu-logo">💀 GAME OVER</div>
-      <div id="go-score"></div>
-      <button class="menu-btn" id="btn-retry">🔄 OPNIEUW</button>
-      <button class="menu-btn secondary" id="btn-go-menu">🏠 MENU</button>
-    </div>
-  </div>
+    let state = 'menu'; // menu, play, pause, gameover, win
+    let currentLevelIdx = 0;
+    let levelData = null;
+    let player = null;
+    let camera = { x: 0, y: 0 };
+    let score = 0;
+    let lives = 3;
+    let coins = 0;
+    let timeLeft = 400;
+    let timeCounter = 0;
+    let particles = [];
+    let floatingTexts = [];
+    let enemies = [];
+    let powerState = 0; // 0=small,1=big,2=fire
+    let invincibleFrames = 0;
 
-  <div id="screen-win" class="fullscreen-overlay hidden">
-    <div class="menu-box win-box">
-      <div class="menu-logo">🏆 GEWONNEN!</div>
-      <div id="win-score"></div>
-      <div id="win-coins"></div>
-      <button class="menu-btn" id="btn-next">VOLGENDE LEVEL ▶</button>
-      <button class="menu-btn secondary" id="btn-win-menu">🏠 MENU</button>
-    </div>
-  </div>
+    // input
+    let keys = { left: false, right: false, jump: false, run: false };
+    let prevJump = false;
+    let jumpBuffer = 0;
+    let coyoteTimer = 0;
 
-  <div id="msg-popup" class="hidden"></div>
+    // 10 LEVELS DEFINITIES (extreem veel vijanden en elementen)
+    const LEVELS_CONFIG = [
+      { name: "1-1 Groene Vlakte", theme: "grass", bgColor: ["#5c9ce0","#3980c0"], time: 400, startX: 2, startY: 14, width: 220, height: 20, build: buildLevelMassive(1) },
+      { name: "1-2 Zand Duinen", theme: "desert", bgColor: ["#e8b55a","#c28a3e"], time: 420, startX: 2, startY: 14, width: 240, height: 20, build: buildLevelMassive(2) },
+      { name: "2-1 Nacht Kasteel", theme: "night", bgColor: ["#12102a","#2a1e4a"], time: 450, startX: 2, startY: 14, width: 250, height: 20, build: buildLevelMassive(3) },
+      { name: "2-2 IJs Grot", theme: "ice", bgColor: ["#8ecae6","#4699c4"], time: 430, startX: 2, startY: 14, width: 260, height: 20, build: buildLevelMassive(4) },
+      { name: "3-1 Vulkaan Hel", theme: "volcano", bgColor: ["#702020","#3e0a0a"], time: 480, startX: 2, startY: 13, width: 270, height: 20, build: buildLevelMassive(5) },
+      { name: "3-2 Jungle Ruïne", theme: "jungle", bgColor: ["#2f6b2f","#1e451e"], time: 460, startX: 2, startY: 14, width: 280, height: 20, build: buildLevelMassive(6) },
+      { name: "4-1 Luchtpaleis", theme: "sky", bgColor: ["#7ccfff","#3c9eff"], time: 500, startX: 2, startY: 13, width: 290, height: 20, build: buildLevelMassive(7) },
+      { name: "4-2 Mijnschacht", theme: "mine", bgColor: ["#5a4a3a","#3a2a1e"], time: 520, startX: 2, startY: 14, width: 300, height: 20, build: buildLevelMassive(8) },
+      { name: "5-1 Donker Kasteel", theme: "castle", bgColor: ["#3a2a4e","#1a0a2e"], time: 550, startX: 2, startY: 14, width: 310, height: 20, build: buildLevelMassive(9) },
+      { name: "⭐ 5-2 Finale Bowser's Domain", theme: "lava", bgColor: ["#a13020","#4a1008"], time: 600, startX: 2, startY: 14, width: 340, height: 22, build: buildLevelMassive(10) }
+    ];
 
-  <canvas id="gameCanvas"></canvas>
+    // Helper om massieve levels te genereren met honderden vijanden, munten, blokken
+    function buildLevelMassive(seed) {
+      return (W, H) => {
+        const map = Array(H).fill().map(() => Array(W).fill(0));
+        // vloer
+        for(let x=0; x<W; x++) { if(H-2>=0) map[H-2][x]=1; map[H-1][x]=1; } // grond
+        // extra platformen en obstakels
+        for(let i=0;i<W/3;i++) {
+          let x = i*3 + (seed*13)%W;
+          let y = H-4 - (i%3);
+          if(y>2 && x<W-2) { map[y][x]=1; if(i%2===0) map[y-1][x]=2; }
+        }
+        // zwevende blokken en coins
+        for(let i=0;i<W/2;i++) {
+          let x = (i*7)%W, y = H-6 - (i%5);
+          if(y>1 && x<W-1) { map[y][x] = 4; } // ? block
+          if(i%3===0 && x+1<W) map[y-1][x] = 8; // coin
+        }
+        // vijanden (honderden!)
+        let enemyList = [];
+        for(let i=0;i<W/2;i++) {
+          let x = (i*12 + seed*50) % (W*TILE - 200);
+          let y = (H-2)*TILE - 10;
+          let type = (i%7===0)?'koopa':(i%5===0)?'fly':(i%3===0?'goomba':'goomba');
+          if(i%11===0) type='hammer';
+          enemyList.push({ x: x + 40, y: y, type: type, dir: (i%2===0)?-1:1, alive: true, vy:0, onGround:false, timer:0 });
+        }
+        // extra vijanden in de lucht
+        for(let i=0;i<40;i++) {
+          let x = (i*50)%(W*TILE);
+          let y = (H-7)*TILE - (i%4)*20;
+          enemyList.push({ x:x+30, y:y, type:'fly', dir:1, alive:true, vy:0, onGround:false, timer:i*10 });
+        }
+        // finish vlag altijd rechts
+        for(let r=H-6; r<H-1; r++) map[r][W-3] = 9;
+        // extra hazard (lava, spikes)
+        for(let i=0;i<W/4;i++) { let x=i*4; if(x<W) map[H-1][x]= (seed%2===0)?10:11; }
+        return { map, W, H, enemies: enemyList };
+      };
+    }
 
-  <div id="mobile-controls">
-    <div class="mc-left">
-      <button class="mc-btn" id="mc-left">◀</button>
-      <button class="mc-btn" id="mc-right">▶</button>
-    </div>
-    <div class="mc-right">
-      <button class="mc-btn mc-run" id="mc-run">X</button>
-      <button class="mc-btn mc-jump" id="mc-jump">Z</button>
-    </div>
-  </div>
+    function loadLevel(idx){
+      let cfg = LEVELS_CONFIG[idx];
+      const W = cfg.width;
+      const H = cfg.height;
+      const generated = cfg.build(W, H);
+      const map = generated.map;
+      const enemiesRaw = generated.enemies;
+      // level object
+      return {
+        name: cfg.name,
+        theme: cfg.theme,
+        bgColor: cfg.bgColor,
+        timeLimit: cfg.time,
+        W, H, map,
+        enemies: enemiesRaw.map(e=>({...e})),
+        startX: cfg.startX * TILE,
+        startY: cfg.startY * TILE,
+      };
+    }
 
-  <script src="script.js"></script>
-</body>
-</html>
+    function startLevel(index){
+      currentLevelIdx = index;
+      levelData = loadLevel(currentLevelIdx);
+      timeLeft = levelData.timeLimit;
+      timeCounter = 0;
+      enemies = levelData.enemies.map(e=>({...e, alive:true, vy:0, onGround:false}));
+      score = score;
+      lives = lives;
+      coins = coins;
+      powerState = 0;
+      invincibleFrames = 0;
+      player = {
+        x: levelData.startX, y: levelData.startY,
+        vx:0, vy:0, w: 38, h: 42, onGround: false, facing:1,
+        dead: false, deadTimer:0, invincible:0, running:false,
+        walkCycle:0, walkTimer:0
+      };
+      camera.x = 0;
+      camera.y = 0;
+      particles = [];
+      floatingTexts = [];
+      state = 'play';
+      document.querySelectorAll('.menu').forEach(m=>m.classList.add('hidden'));
+      updateUI();
+    }
+
+    function updateUI(){
+      document.getElementById('score').innerText = String(score).padStart(7,'0');
+      document.getElementById('coins').innerText = coins;
+      document.getElementById('worldName').innerHTML = levelData?levelData.name:"1-1";
+      document.getElementById('time').innerHTML = Math.max(0,Math.ceil(timeLeft));
+      document.getElementById('lives').innerHTML = lives;
+    }
+
+    // tile helpers
+    function getTile(c,r){
+      if(!levelData) return 0;
+      if(r<0||r>=levelData.H||c<0||c>=levelData.W) return 0;
+      return levelData.map[r][c];
+    }
+    function isSolid(t){ return t===1||t===2||t===3||t===5||t===6||t===7; }
+    function isLethal(t){ return t===10||t===11; }
+    function isCoinTile(t){ return t===8; }
+    function isBlock(t){ return t===4||t===5; }
+
+    function moveEntity(ent,dx,dy,isPlayer){
+      ent.x += dx;
+      let left = Math.floor(ent.x/TILE), right = Math.floor((ent.x+ent.w-1)/TILE);
+      let top = Math.floor(ent.y/TILE), bot = Math.floor((ent.y+ent.h-1)/TILE);
+      for(let c=left;c<=right;c++){
+        for(let r=top;r<=bot;r++){
+          let t = getTile(c,r);
+          if(isSolid(t)){
+            if(dx>0) ent.x = c*TILE - ent.w;
+            if(dx<0) ent.x = (c+1)*TILE;
+            if(isPlayer) ent.vx = 0;
+          }
+        }
+      }
+      ent.onGround = false;
+      ent.y += dy;
+      left = Math.floor(ent.x/TILE); right = Math.floor((ent.x+ent.w-1)/TILE);
+      top = Math.floor(ent.y/TILE); bot = Math.floor((ent.y+ent.h-1)/TILE);
+      for(let c=left;c<=right;c++){
+        for(let r=top;r<=bot;r++){
+          let t = getTile(c,r);
+          if(isSolid(t)){
+            if(dy>0) { ent.y = r*TILE - ent.h; ent.vy = 0; ent.onGround = true; }
+            if(dy<0) { ent.y = (r+1)*TILE; ent.vy = 0; if(isPlayer && isBlock(t)) { breakBlock(c,r); } }
+          }
+        }
+      }
+    }
+
+    function breakBlock(cx,cy){
+      let t = getTile(cx,cy);
+      if(t===4){
+        levelData.map[cy][cx]=0;
+        coins++; score+=100;
+        addFloatingText(cx*TILE+TILE/2, cy*TILE, "+100🪙", "#ffcc44");
+        spawnParticles(cx*TILE+TILE/2, cy*TILE, 6, "#ffaa33");
+      }
+      if(t===5 && powerState>0){
+        levelData.map[cy][cx]=0;
+        score+=200;
+        addFloatingText(cx*TILE+TILE/2, cy*TILE, "POW!", "#ff8844");
+      }
+    }
+
+    function updatePlayerMovement(){
+      if(player.dead) {
+        player.deadTimer++;
+        player.vy += GRAVITY;
+        player.y += player.vy;
+        if(player.deadTimer>70){
+          lives--;
+          if(lives<=0){ state='gameover'; document.getElementById('finalScore').innerHTML="Score: "+score; document.getElementById('gameoverMenu').classList.remove('hidden');}
+          else { startLevel(currentLevelIdx); }
+        }
+        return;
+      }
+      if(invincibleFrames>0) invincibleFrames--;
+      let speed = (keys.run ? RUN_SPEED : WALK_SPEED);
+      let acc = 0.55, dec = 0.45;
+      if(keys.left) { player.vx = Math.max(player.vx-acc, -speed); player.facing = -1; }
+      else if(keys.right) { player.vx = Math.min(player.vx+acc, speed); player.facing = 1; }
+      else { player.vx *= 0.92; }
+      player.running = Math.abs(player.vx) > WALK_SPEED;
+
+      // coyote
+      if(player.onGround) coyoteTimer = COYOTE;
+      else if(coyoteTimer>0) coyoteTimer--;
+      if(keys.jump && !prevJump) jumpBuffer = JUMP_BUFFER_FRAMES;
+      if(jumpBuffer>0 && coyoteTimer>0){
+        player.vy = player.running ? RUN_JUMP : JUMP_FORCE;
+        coyoteTimer=0; jumpBuffer=0;
+      }
+      if(jumpBuffer>0) jumpBuffer--;
+      if(!keys.jump && player.vy<-5) player.vy+=1.2;
+      player.vy += GRAVITY;
+      if(player.vy>MAX_FALL) player.vy=MAX_FALL;
+      moveEntity(player, player.vx, player.vy, true);
+      // munten verzamelen
+      let mx = Math.floor((player.x+player.w/2)/TILE), my = Math.floor((player.y+player.h/2)/TILE);
+      if(isCoinTile(getTile(mx,my))){ levelData.map[my][mx]=0; coins++; score+=50; addFloatingText(mx*TILE, my*TILE, "🪙", "#ffd966"); }
+      // lethal tiles
+      if(isLethal(getTile(mx, my)) || isLethal(getTile(Math.floor(player.x/TILE), Math.floor(player.y/TILE)))) killPlayer();
+      // finish vlag (tile 9)
+      if(getTile(mx,my)===9 || getTile(mx+1,my)===9){ winLevel(); }
+      // val death
+      if(player.y > levelData.H*TILE + 100) killPlayer();
+      camera.x = player.x + player.w/2 - canvasW/2;
+      camera.x = Math.max(0, Math.min(camera.x, levelData.W*TILE - canvasW));
+    }
+
+    function killPlayer(){
+      if(player.dead) return;
+      if(powerState>0 && invincibleFrames<=0){
+        powerState--;
+        invincibleFrames=45;
+        player.h = 42;
+        addFloatingText(player.x, player.y-20, "OUCH!", "#ff6666");
+        return;
+      }
+      player.dead=true; player.vy=-12; player.vx=0;
+      spawnParticles(player.x+player.w/2,player.y+player.h/2,20,"#ff3300");
+    }
+
+    function winLevel(){
+      let bonus = Math.floor(timeLeft)*10;
+      score += bonus;
+      state='win';
+      document.getElementById('winStats').innerHTML = `SCORE: ${score}<br>MUNTEN: ${coins}<br>TIJDBONUS: +${bonus}`;
+      document.getElementById('winMenu').classList.remove('hidden');
+    }
+
+    function updateEnemies(){
+      for(let i=0;i<enemies.length;i++){
+        let e = enemies[i];
+        if(!e.alive) continue;
+        let spd = (e.type==='fly'?1.7:e.type==='koopa'?1.3:e.type==='hammer'?1.0:1.2);
+        if(e.type==='fly'){
+          e.x += e.dir * spd;
+          e.timer = (e.timer||0)+0.08;
+          e.y += Math.sin(e.timer)*1.4;
+          if(e.x < camera.x-100) e.dir=1;
+          if(e.x > camera.x+canvasW+100) e.dir=-1;
+        } else {
+          e.vy += GRAVITY;
+          e.x += e.dir * spd;
+          moveEntity(e, e.dir*spd, e.vy, false);
+          if(!e.onGround && e.vy>0){
+            let below = Math.floor((e.y+e.h)/TILE);
+            let left = Math.floor(e.x/TILE);
+            if(!isSolid(getTile(left,below)) && !isSolid(getTile(left+1,below))) e.dir*=-1;
+          }
+        }
+        // collision met speler
+        if(!player.dead && invincibleFrames<=0){
+          if(player.x+player.w-8 > e.x && player.x+8 < e.x+38 && player.y+player.h-8 > e.y && player.y+12 < e.y+40){
+            if(player.vy>0 && player.y+player.h-12 < e.y+25){
+              e.alive=false; score+= (e.type==='koopa'?300:150);
+              player.vy = -9;
+              addFloatingText(e.x, e.y, e.type==='koopa'?"+300":"+150","#ffff88");
+              spawnParticles(e.x+20, e.y+20,8,"#dd8844");
+            } else killPlayer();
+          }
+        }
+        if(e.y > levelData.H*TILE+200) e.alive=false;
+      }
+    }
+
+    function addFloatingText(x,y,text,col){ floatingTexts.push({x,y,text,col,life:45,vy:-1.2}); }
+    function spawnParticles(x,y,count,col){ for(let i=0;i<count;i++) particles.push({x,y,vx:(Math.random()-0.5)*4,vy:(Math.random()-1)*3,life:30+Math.random()*20,color:col,size:3+Math.random()*4}); }
+    function updateParticles(){ particles = particles.filter(p=>{ p.x+=p.vx; p.y+=p.vy; p.life--; return p.life>0; }); floatingTexts = floatingTexts.filter(t=>{ t.y+=t.vy; t.life--; return t.life>0; }); }
+
+    function updateTime(){
+      if(state!=='play') return;
+      timeCounter++;
+      if(timeCounter>=60){ timeLeft--; timeCounter=0; if(timeLeft<=0) killPlayer(); }
+      updateUI();
+    }
+
+    // ---------- 3D Mario tekenen (shaded, highlight) ----------
+    function drawPlayer3D(){
+      let px = player.x - camera.x;
+      let py = player.y - camera.y;
+      let w=player.w, h=player.h;
+      ctx.save();
+      if(invincibleFrames>0 && (Math.floor(Date.now()/50)%4<2)) ctx.globalAlpha=0.5;
+      // body shading 3d
+      ctx.shadowBlur=
